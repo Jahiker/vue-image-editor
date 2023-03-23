@@ -3,10 +3,10 @@
     <div
       class="container grid grid-cols-1 md:grid-cols-2 max-w-[800px] mx-auto p-[30px] rounded-3xl shadow-2xl backdrop-blur-lg bg-slate-50/10">
       <div class="header md:col-span-2 py-5">
-        <h1 class="text-[30px] font-bold text-center">Vue Image Editor</h1>
+        <h1 class="md:text-[30px] text-[20px] font-bold text-center">Vue Image Editor</h1>
       </div>
       <div class="editor min-w-[300px] pr-8 flex flex-col justify-center">
-        <label class="title mb-3 inline-block text-[30px] font-bold">Filters:</label>
+        <label class="title mb-3 inline-block md:text-[30px] text-[20px] font-bold">Filters:</label>
         <div class="slider">
           <div class="filter-info">
             <p class="name">brightness:</p>
@@ -52,11 +52,14 @@
         </div>
       </div>
       <div class="image w-full flex flex-col justify-center">
-        <figure class="md:w-[365px] md:h-[365px] w-[265px] h-[265px] mb-5">
-          <img ref="image" :src="imageSrc" alt="Image" class="w-[100%] h-[100%] object-contain rounded-xl" loading="lazy" width="400" height="400">
+        <figure class="md:w-[365px] md:h-[365px] w-[265px] h-[265px] mb-5 mx-auto">
+          <img ref="image" :src="imageSrc" alt="Image" class="w-[100%] h-[100%] object-contain rounded-xl mx-auto" loading="lazy" width="400" height="400">
         </figure>
         <div class="ctas">
-          <input type="file" class="mb-3" @change="changeImageSrc" enctype="multipart/form-data">
+          <span class="mb-4 flex flex-col justify-center items-center w-full overflow-hidden relative">
+            <button class="w-full rounded-lg px-[15px] py-[5px] bg-blue-600 text-white cursor-pointer">{{ imageName }}</button>
+            <input type="file" class="opacity-0 absolute inset-0 cursor-pointer w-full" @change="changeImageSrc" enctype="multipart/form-data">
+          </span>
           <div class="flex justify-between">
             <button @click="resetImage"
               class="w-[48%] inline-block rounded-lg mb-5 px-[15px] py-[5px] bg-white text-blue-600"
@@ -80,12 +83,12 @@ export default {
   data() {
     return {
       imageSrc: defaultImage,
+      imageName: "Seleccionar Imagen",
       brightness: 100,
       saturation: 100,
       inversion: 0,
       grayscale: 0,
       rotate: 0,
-      flip: 0,
       flipHorizontal: 1,
       flipVertical: 1
     }
@@ -107,7 +110,9 @@ export default {
   methods: {
     changeImageSrc(event) {
       const file = event.target.files[0];
+      console.log(file)
       if (!file) return;
+      this.imageName = file.name;
       this.imageSrc = URL.createObjectURL(file);
     },
     saveImage() {
@@ -130,7 +135,16 @@ export default {
       link.click();
     },
     resetImage() {
-      this.imageSrc = defaultImage
+      this.imageSrc = defaultImage;
+      this.imageName = "Seleccionar Imagen";
+      this.brightness= 100,
+      this.saturation= 100,
+      this.inversion= 0,
+      this.grayscale= 0,
+      this.rotate= 0,
+      this.flipHorizontal= 1,
+      this.flipVertical= 1
+      this.$refs.image.style.transform = `rotate(0deg)`
     },
     rotateImage() {
       this.rotate = this.rotate + 90;
@@ -138,11 +152,11 @@ export default {
     },
     flipHorizontalImage() {
       this.flipHorizontal = this.flipHorizontal * -1;
-      this.$refs.image.style.transform = `scaleX(${this.flipHorizontal})`
+      this.$refs.image.style.transform = `scaleX(${this.flipHorizontal}) scaleY(${this.flipVertical})`
     },
     flipVerticalImage() {
       this.flipVertical = this.flipVertical * -1;
-      this.$refs.image.style.transform = `scaleY(${this.flipVertical})`
+      this.$refs.image.style.transform = `scaleX(${this.flipHorizontal}) scaleY(${this.flipVertical})`
     }
   },
   components: {
